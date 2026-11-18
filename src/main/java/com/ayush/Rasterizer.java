@@ -15,6 +15,15 @@ public class Rasterizer {
             Color color
     ) {
 
+        if (image == null || depthBuffer == null || a == null || b == null
+                || c == null || color == null
+                || !Double.isFinite(a.x) || !Double.isFinite(a.y) || !Double.isFinite(a.z)
+                || !Double.isFinite(b.x) || !Double.isFinite(b.y) || !Double.isFinite(b.z)
+                || !Double.isFinite(c.x) || !Double.isFinite(c.y) || !Double.isFinite(c.z)
+                || a.z <= 0 || b.z <= 0 || c.z <= 0) {
+            return;
+        }
+
         int minX = Math.max(0, (int) Math.floor(
                 Math.min(a.x, Math.min(b.x, c.x))));
 
