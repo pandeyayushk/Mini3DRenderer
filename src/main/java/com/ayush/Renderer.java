@@ -6,20 +6,38 @@ import java.awt.*;
 public class Renderer extends JPanel {
 
     private final double scale = 250;
+    private double angle = 0;
 
-    private final Vector3 v1 = new Vector3(0, 1, 3);
-    private final Vector3 v2 = new Vector3(-1, -1, 4);
-    private final Vector3 v3 = new Vector3(1, -1, 4);
-    private final Vector3 v4 = new Vector3(0, -1, 2);
+    private final Vector3 v1 = new Vector3(0, 1, 0);
+    private final Vector3 v2 = new Vector3(-1, -1, 1);
+    private final Vector3 v3 = new Vector3(1, -1, 1);
+    private final Vector3 v4 = new Vector3(0, -1, -1);
 
     public Renderer(){
         setPreferredSize(new Dimension(800,600));
         setBackground(Color.BLACK);
+
+        Timer timer = new Timer(16, e -> {
+            angle += 0.02;
+            repaint();
+        });
+
+        timer.start();
+
     }
 
     private Point project(Vector3 v) {
 
-        Vector2 p = Projection.perspective(v);
+        Vector3 rotated = v.rotateX(angle)
+                .rotateY(angle);
+
+        Vector3 translated = new Vector3(
+                rotated.x,
+                rotated.y,
+                rotated.z + 4
+        );
+
+        Vector2 p = Projection.perspective(translated);
 
         int screenX = (int) (400 + p.x * scale);
         int screenY = (int) (300 - p.y * scale);
