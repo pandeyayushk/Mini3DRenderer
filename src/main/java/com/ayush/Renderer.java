@@ -9,6 +9,8 @@ public class Renderer extends JPanel {
     private final int height = 600;
     private final double scale = 250;
     private double angle = 0;
+    private final BufferedImage image =
+            new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
     private final Vector3 v1 = new Vector3(0, 1, 0);
     private final Vector3 v2 = new Vector3(-1, -1, 1);
@@ -55,9 +57,10 @@ public class Renderer extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        BufferedImage image =
-                new BufferedImage(width, height,
-                        BufferedImage.TYPE_INT_RGB);
+        Graphics2D imageGraphics = image.createGraphics();
+        imageGraphics.setColor(Color.BLACK);
+        imageGraphics.fillRect(0, 0, width, height);
+        imageGraphics.dispose();
 
         depthBuffer.clear();
 
