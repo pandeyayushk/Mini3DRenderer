@@ -6,4 +6,12 @@ public class Projection {
 
         return new Vector2(point.x, point.y);
     }
+
+    public static Vector2 perspective(Vector3 point) {
+
+        double x = point.x / point.z;
+        double y = point.y / point.z;
+
+        return new Vector2(x, y);
+    }
 }
