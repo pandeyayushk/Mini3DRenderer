@@ -1,7 +1,7 @@
 
 package com.ayush;
 
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 public class Rasterizer {
@@ -15,19 +15,21 @@ public class Rasterizer {
             Color color
     ) {
 
-        Vector2 p1 = Projection.perspective(a);
-        Vector2 p2 = Projection.perspective(b);
-        Vector2 p3 = Projection.perspective(c);
+        int minX = Math.max(0, (int) Math.floor(
+                Math.min(a.x, Math.min(b.x, c.x))));
 
-        int minX = Math.max(0, (int) Math.floor(Math.min(p1.x,
-                Math.min(p2.x, p3.x))));
-        int maxX = Math.min(image.getWidth() - 1,
-                (int) Math.ceil(Math.max(p1.x, Math.max(p2.x, p3.x))));
+        int maxX = Math.min(image.getWidth() - 1, (int) Math.ceil(
+                Math.max(a.x, Math.max(b.x, c.x))));
 
-        int minY = Math.max(0, (int) Math.floor(Math.min(p1.y,
-                Math.min(p2.y, p3.y))));
-        int maxY = Math.min(image.getHeight() - 1,
-                (int) Math.ceil(Math.max(p1.y, Math.max(p2.y, p3.y))));
+        int minY = Math.max(0, (int) Math.floor(
+                Math.min(a.y, Math.min(b.y, c.y))));
+
+        int maxY = Math.min(image.getHeight() - 1, (int) Math.ceil(
+                Math.max(a.y, Math.max(b.y, c.y))));
+
+        Vector2 p1 = new Vector2(a.x, a.y);
+        Vector2 p2 = new Vector2(b.x, b.y);
+        Vector2 p3 = new Vector2(c.x, c.y);
 
         double area = edge(p1, p2, p3);
 
@@ -44,9 +46,15 @@ public class Rasterizer {
 
                 if (alpha >= 0 && beta >= 0 && gamma >= 0) {
 
-                    double z = alpha * a.z
-                            + beta * b.z
-                            + gamma * c.z;
+                    // Perspective-correct depth interpolation
+                    double inverseZ =
+                            alpha / a.z +
+                                    beta / b.z +
+                                    gamma / c.z;
+
+                    if (inverseZ <= 0) continue;
+
+                    double z = 1.0 / inverseZ;
 
                     if (depthBuffer.testAndSet(x, y, z)) {
                         image.setRGB(x, y, color.getRGB());
