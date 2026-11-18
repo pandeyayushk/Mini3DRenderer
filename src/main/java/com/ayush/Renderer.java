@@ -2,9 +2,11 @@ package com.ayush;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Renderer extends JPanel {
-
+    private final int width = 800;
+    private final int height = 600;
     private final double scale = 250;
     private double angle = 0;
 
@@ -12,6 +14,8 @@ public class Renderer extends JPanel {
     private final Vector3 v2 = new Vector3(-1, -1, 1);
     private final Vector3 v3 = new Vector3(1, -1, 1);
     private final Vector3 v4 = new Vector3(0, -1, -1);
+
+    private final DepthBuffer depthBuffer=new DepthBuffer(width, height);
 
     public Renderer(){
         setPreferredSize(new Dimension(800,600));
@@ -26,7 +30,7 @@ public class Renderer extends JPanel {
 
     }
 
-    private Point project(Vector3 v) {
+    private Vector3 project(Vector3 v) {
 
         Vector3 rotated = v.rotateX(angle)
                 .rotateY(angle);
@@ -37,35 +41,51 @@ public class Renderer extends JPanel {
                 rotated.z + 4
         );
 
-        Vector2 p = Projection.perspective(translated);
+        double x = translated.x / translated.z;
+        double y = translated.y / translated.z;
 
-        int screenX = (int) (400 + p.x * scale);
-        int screenY = (int) (300 - p.y * scale);
-
-        return new Point(screenX, screenY);
+        return new Vector3(
+                width / 2.0 + x * scale,
+                height / 2.0 - y * scale,
+                translated.z
+        );
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        Graphics2D g2 = (Graphics2D) g;
+        BufferedImage image =
+                new BufferedImage(width, height,
+                        BufferedImage.TYPE_INT_RGB);
 
-        g2.setColor(Color.GREEN);
-        g2.setStroke(new BasicStroke(2));
+        depthBuffer.clear();
 
-        Point p1 = project(v1);
-        Point p2 = project(v2);
-        Point p3 = project(v3);
-        Point p4 = project(v4);
+        Vector3 p1 = project(v1);
+        Vector3 p2 = project(v2);
+        Vector3 p3 = project(v3);
+        Vector3 p4 = project(v4);
 
-        // Six edges of the tetrahedron
-        g2.drawLine(p1.x, p1.y, p2.x, p2.y);
-        g2.drawLine(p1.x, p1.y, p3.x, p3.y);
-        g2.drawLine(p1.x, p1.y, p4.x, p4.y);
+        Rasterizer.drawTriangle(
+                image, depthBuffer, p1, p2, p3,
+                Color.GREEN
+        );
 
-        g2.drawLine(p2.x, p2.y, p3.x, p3.y);
-        g2.drawLine(p2.x, p2.y, p4.x, p4.y);
-        g2.drawLine(p3.x, p3.y, p4.x, p4.y);
+        Rasterizer.drawTriangle(
+                image, depthBuffer, p1, p3, p4,
+                Color.CYAN
+        );
+
+        Rasterizer.drawTriangle(
+                image, depthBuffer, p1, p4, p2,
+                Color.ORANGE
+        );
+
+        Rasterizer.drawTriangle(
+                image, depthBuffer, p2, p4, p3,
+                Color.MAGENTA
+        );
+
+        g.drawImage(image, 0, 0, null);
     }
 }
