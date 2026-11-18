@@ -9,7 +9,7 @@ public class Main {
 
             Renderer renderer=new Renderer();
 
-            
+
             frame.setVisible(true);
 
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
