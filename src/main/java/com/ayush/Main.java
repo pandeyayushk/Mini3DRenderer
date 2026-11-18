@@ -9,12 +9,7 @@ public class Main {
 
             Renderer renderer=new Renderer();
 
-
-            frame.setVisible(true);
-
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-            frame.setLocationRelativeTo(null);
 
             frame.setResizable(false);
 
@@ -23,6 +18,10 @@ public class Main {
 
 
             frame.pack();
+
+            frame.setLocationRelativeTo(null);
+
+            frame.setVisible(true);
         });
     }
 }

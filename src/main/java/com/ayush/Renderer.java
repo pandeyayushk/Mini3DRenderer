@@ -5,7 +5,7 @@ import java.awt.*;
 
 public class Renderer extends JPanel {
     public Renderer(){
-        setSize(new Dimension(800,600));
+        setPreferredSize(new Dimension(800,600));
         setBackground(Color.BLACK);
     }
     @Override
